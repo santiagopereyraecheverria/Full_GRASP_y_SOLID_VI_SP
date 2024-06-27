@@ -3,16 +3,23 @@
 // Copyright (c) Programación II. Derechos reservados.
 // </copyright>
 //-------------------------------------------------------------------------
+// Patrón(es) o principio(s) usados:
+// - Single Responsibility Principle (SRP): La clase Recipe maneja los pasos de una receta y el estado de cocción.
+// - Open/Closed Principle (OCP): La clase Recipe puede ser extendida sin modificar su comportamiento existente.
+// - Dependency Inversion Principle (DIP): La clase Recipe depende de abstracciones (IRecipeContent y TimerClient).
+// - Interface Segregation Principle (ISP): Se define la interfaz IRecipeContent para asegurar que las clases solo implementen métodos necesarios.
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Full_GRASP_And_SOLID
 {
-    public class Recipe : IRecipeContent // Modificado por DIP
+    public class Recipe : IRecipeContent, TimerClient // Modificado por DIP y para implementar TimerClient
     {
-        // Cambiado por OCP
         private IList<BaseStep> steps = new List<BaseStep>();
+        private bool cooked = false;
+        private CountdownTimer timer;
 
         public Product FinalProduct { get; set; }
 
@@ -61,6 +68,36 @@ namespace Full_GRASP_And_SOLID
             }
 
             return result;
+        }
+
+        // Método para obtener el tiempo total de cocción
+        public int GetCookTime()
+        {
+            int totalCookTime = 0;
+            foreach (BaseStep step in this.steps)
+            {
+                totalCookTime += step.Time;
+            }
+            return totalCookTime;
+        }
+
+        // Propiedad de solo lectura que indica si la receta está cocida
+        public bool Cooked
+        {
+            get { return cooked; }
+        }
+
+        // Método para cocinar la receta
+        public void Cook()
+        {
+            timer = new CountdownTimer();
+            timer.Register(GetCookTime(), this);
+        }
+
+        // Implementación de la interfaz TimerClient
+        public void TimeOut()
+        {
+            cooked = true;
         }
     }
 }

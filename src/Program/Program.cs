@@ -7,13 +7,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace Full_GRASP_And_SOLID
 {
+    // Patrón(es) o principio(s) usados:
+    // - Creator: El método `AddStep` crea y agrega pasos a la receta.
+    // - Single Responsibility Principle (SRP): La clase `Program` es responsable de la configuración y ejecución del programa principal.
+    // - Dependency Inversion Principle (DIP): Se usa la interfaz `IPrinter` para imprimir la receta, permitiendo diferentes implementaciones de impresión.
     public class Program
     {
         private static List<Product> productCatalog = new List<Product>();
-
         private static List<Equipment> equipmentCatalog = new List<Equipment>();
 
         public static void Main(string[] args)
@@ -31,6 +35,12 @@ namespace Full_GRASP_And_SOLID
             printer.PrintRecipe(recipe);
             printer = new FilePrinter();
             printer.PrintRecipe(recipe);
+
+            // Código para probar la funcionalidad de cocción
+            Console.WriteLine($"Cooked: {recipe.Cooked}");
+            recipe.Cook();
+            Thread.Sleep(500); // 0.5 segundos
+            Console.WriteLine($"Cooked: {recipe.Cooked}");
         }
 
         private static void PopulateCatalogs()
